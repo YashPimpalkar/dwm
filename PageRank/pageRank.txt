@@ -1,0 +1,37 @@
+import numpy as np
+
+def page_rank(links, damping_factor=0.85, max_iterations=100, convergence_threshold=1e-4):
+    total_pages = len(links)
+    transition_matrix = np.zeros((total_pages, total_pages))
+
+    # Create the transition matrix based on the links
+    for page in links:
+        if len(links[page]):
+            for link in links[page]:
+                transition_matrix[link, page] = 1 / len(links[page])
+
+    # Initialize the PageRank scores
+    page_rank = np.ones(total_pages) / total_pages
+
+    # Power iteration method to calculate PageRank
+    for _ in range(max_iterations):
+        prev_rank = np.copy(page_rank)
+        page_rank = (1 - damping_factor) / total_pages + damping_factor * np.dot(transition_matrix, page_rank)
+        if np.linalg.norm(page_rank - prev_rank) < convergence_threshold:
+            break
+
+    return page_rank
+
+# Example network of web pages
+# Dictionary where keys are page indices and values are lists of indices representing outgoing links from that page
+links = {
+    0: [1, 2],
+    1: [0, 2],
+    2: [0]
+}
+
+# Calculate PageRank and HITS
+pr = page_rank(links)
+hub_scores, authority_scores = hits_algorithm(links)
+
+print("PageRank scores:", pr)

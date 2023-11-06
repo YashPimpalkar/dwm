@@ -1,0 +1,33 @@
+!pip install apyori
+
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+from apyori import apriori
+
+dataset = pd.read_csv('/content/store_data.csv', header=None)
+transactions = []
+
+# Assuming there are 7501 rows in the dataset
+for i in range(0, 7501):
+    transactions.append([str(dataset.values[i, j]) for j in range(0, 20)])
+
+rules = apriori(transactions,
+                min_support=0.003,
+                min_confidence=0.2,
+                min_lift=3,
+                min_length=2)
+
+MB = list(rules)
+
+for rule in MB:
+    # Each rule contains support, ordered_statistics etc.
+    for item in rule.ordered_statistics:
+        pair = item.items_base, item.items_add
+        print("Rule: " + str(pair[0]) + " -> " + str(pair[1]))  # print the rule
+
+        print("Support: " + str(rule.support))  # print support value
+
+        print("Confidence: " + str(item.confidence))
+        print("Lift: " + str(item.lift))
+        print("=====================================")
